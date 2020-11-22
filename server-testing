@@ -1,0 +1,53 @@
+#!/bin/bash
+#Class: CIT 470
+#Team: Team 2
+#Professor: Darci Guriel
+#Purpose: This will test monit on the server
+#Authors: Sarah Martin, Brandon Hart, and Kyle Boger
+
+yum install stress -y
+
+echo "Testing Monit on Server..."
+
+#Test SSH
+echo "Stopping SSH..."
+systemctl stop sshd
+sleep 45
+monit summary
+
+#Test Syslog
+echo "Stopping Syslog..."
+systemctl stop rsyslog
+sleep 45
+monit summary
+
+#Test NFS
+echo "Stopping NFS..."
+systemctl stop nfs
+sleep 45
+monit summary
+
+#Test LDAP
+echo "Stopping LDAP..."
+systemctl stop slapd
+sleep 45
+monit summary
+
+#Test Apache
+echo "Stopping Apache..."
+systemctl stop httpd
+sleep 45
+monit summary
+
+#Test CPU usage and memory
+stress --cpu 2 --vm-bytes 33800MB --timeout 45s
+monit summary
+
+#Test Disk Capacity
+dd if=/dev/zero of=/diskhog bs=1M count=10000 oflag=append conv=notrunc
+monit summary
+rm /diskhog
+sleep 30
+monit summary
+
+echo "Monit Server testing complete!"
